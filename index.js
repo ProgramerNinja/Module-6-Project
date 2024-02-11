@@ -4,23 +4,56 @@ const citySearchTerm = document.querySelector('#city-name');
 const activeCity = document.querySelector('#active-city')
 const currentWeather = document.querySelector('#current-weather');
 const fiveDayForecast = document.querySelector('#fiveday-list');
+const searchHistoryList = document.querySelector('.search-list')
 const currentDate = new Date();
 const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
 
-const APIKEY = proccess.env.APIKEY;
+const APIKEY = "72e20f14db0bfe9edb39771320791bc5";
+
+var historyManager = function (city) {
+  var searchHistoryString = localStorage.getItem("cities");
+  var searchHistory = JSON.parse(searchHistoryString) || [];
+
+  if(city) {
+    searchHistory = searchHistory.filter(a => a !== city);
+    searchHistory.unshift(city);
+    console.log(searchHistory);
+    var updatedSearchHistory = JSON.stringify(searchHistory);
+    localStorage.setItem("cities", updatedSearchHistory);
+  }
+
+  citySearchTerm.value = "";
+  searchHistoryList.textContent = "";
+  searchHistoryString = localStorage.getItem("cities");
+  searchHistory = JSON.parse(searchHistoryString) || [];
+  searchHistory.forEach(function(data, index) {
+    let searchItem = document.createElement('li');
+    searchItem.textContent = data;
+    searchItem.setAttribute('class', "list-item")
+    searchHistoryList.appendChild(searchItem);
+    
+    searchItem.addEventListener("click", historyClickManager);
+    });
+}
+
+var historyClickManager = function (event) {
+  event.preventDefault();
+  citySearchTerm.value = event.target.innerHTML;
+}
 
 var formSubmitHandler = function (event) {
   event.preventDefault();
 
   var city = citySearchTerm.value.trim();
 
+
   if (city) {
+    historyManager(city);
     citySearchTerm.value = '';
     currentWeather.textContent = '';
     activeCity.textContent = '';
     fiveDayForecast.textContent = '';
     getCords(city);
-
   } else {
     alert('Please enter a City');
   }
@@ -170,4 +203,5 @@ var displayForecast = function (data) {
   }
 };
 
+historyManager();
 userFormEl.addEventListener('submit', formSubmitHandler);

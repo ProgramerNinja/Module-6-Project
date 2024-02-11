@@ -112,7 +112,7 @@ p {
   box-shadow: 6px 5px var(--light-dark);
 }
 
-.list-group {
+.search-history {
   padding: 0;
   list-style: none;
 }
@@ -137,32 +137,12 @@ p {
   border-radius: var(--border-radius);
 }
 
-.icon-danger {
-  color: rgb(255, 70, 70);
-}
-
-.icon-success {
-  color: rgb(29, 153, 255);
-}
-
 /* CARDS */
 .card {
   margin: 0 0 20px 0;
   border: 3px solid var(--dark);
   border-radius: var(--border-radius);
 }
-
-.card-header {
-  color: var(--primary);
-  background-color: var(--dark);
-  padding: 2.5%;
-  border-radius: calc(.18rem - 1px) calc(.18rem - 1px) 0 0;
-}
-
-.card-body {
-  padding: 2.5%;
-}
-
 /* FORM */
 .form-label,
 .form-input,
