@@ -60,7 +60,7 @@ var formSubmitHandler = function (event) {
 };
 
 var getCords = function (cityName) {
-  let apiUrl = 'http://api.openweathermap.org/geo/1.0/direct?q=' + cityName + '&limit=1&appid=' + APIKEY;
+  let apiUrl = 'https://api.openweathermap.org/geo/1.0/direct?q=' + cityName + '&limit=1&appid=' + APIKEY;
 
   fetch(apiUrl)
     .then(function (response) {
