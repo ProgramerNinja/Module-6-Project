@@ -1,10 +1,10 @@
 const userFormEl = document.querySelector('#user-form');
 const submitButton = document.querySelector('#submit-button');
 const citySearchTerm = document.querySelector('#city-name');
+const activeCity = document.querySelector('#active-city')
 const todayWeather = document.querySelector('.current-weather');
 const fiveDayForecast = document.querySelector('#fiveday-list');
 const APIKEY = proccess.env.APIKEY;
-
 
 var formSubmitHandler = function (event) {
   event.preventDefault();
@@ -13,25 +13,17 @@ var formSubmitHandler = function (event) {
 
   if (city) {
     citySearchTerm.value = '';
+    todayWeather.textContent = '';
+    fiveDayForecast.textContent = '';
     getCords(city);
-    repoContainerEl.textContent = '';
+
   } else {
     alert('Please enter a City');
   }
 };
 
-// var buttonClickHandler = function (event) {
-//   var language = event.target.getAttribute('data-language');
-
-//   if (language) {
-//     getFeaturedRepos(language);
-
-//     repoContainerEl.textContent = '';
-//   }
-// };
-
 var getCords = function (cityName) {
-  let apiUrl = 'http://api.openweathermap.org/geo/1.0/direct?q=' + {cityName} + '&limit=1&appid=' + {APIKEY};
+  let apiUrl = 'http://api.openweathermap.org/geo/1.0/direct?q=' + cityName + '&limit=1&appid=' + APIKEY;
 
   fetch(apiUrl)
     .then(function (response) {
@@ -39,9 +31,9 @@ var getCords = function (cityName) {
         console.log(response);
         response.json().then(function (data) {
           console.log(data);
-          lat = data.lat;
-          log = data.log;
-          displayForecast(lat, log);
+          lat = data[0].lat;
+          lon = data[0].lon;
+          getForecast(lat, lon);
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -52,8 +44,8 @@ var getCords = function (cityName) {
     });
 };
 
-var getForecast = function (lat, lon) {
-  let apiUrl = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + {lat} + '&lon=' + {lon} + '&appid=' + {APIKEY};
+var getForecast = function (lat, lon){
+  let apiUrl = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + lat + '&lon=' + lon + '&appid=' + APIKEY;
 
   fetch(apiUrl)
     .then(function (response) {
@@ -61,7 +53,7 @@ var getForecast = function (lat, lon) {
         console.log(response);
         response.json().then(function (data) {
           console.log(data);
-          displayForecast(data, user);
+          displayForecast(data);
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -72,41 +64,45 @@ var getForecast = function (lat, lon) {
     });
 };
 
-// var displayForecast = function (repos, searchTerm) {
-//   if (repos.length === 0) {
-//     repoContainerEl.textContent = 'No repositories found.';
-//     return;
-//   }
+var displayForecast = function (data) {
 
-//   repoSearchTerm.textContent = searchTerm;
+  for (var i = 0; i < 5; i++) {
 
-//   for (var i = 0; i < repos.length; i++) {
-//     var repoName = repos[i].owner.login + '/' + repos[i].name;
+  if (data.cod !== "200") {
+    fiveDayForecast.textContent = 'No Forecast found.';
+    return;
+  }
 
-//     var repoEl = document.createElement('a');
-//     repoEl.classList = 'list-item flex-row justify-space-between align-center';
-//     repoEl.setAttribute('href', './single-repo.html?repo=' + repoName);
+    weatherList = data.list[i * 8 + 3];
 
-//     var titleEl = document.createElement('span');
-//     titleEl.textContent = repoName;
+    var listItemEl = document.createElement('li')
+    var dateEl = document.createElement('a');
+    var statusEl = document.createElement('img')
+    var tempEl = document.createElement('a');
+    var windEl = document.createElement('a');
+    var humidityEl = document.createElement('a')
 
-//     repoEl.appendChild(titleEl);
+    fiveDayForecast.appendChild(listItemEl);
+    listItemEl.classList = 'list-item flex-row justify-space-between align-center';
+    listItemEl.appendChild(dateEl);
+    listItemEl.appendChild(statusEl);
+    listItemEl.appendChild(tempEl);
+    listItemEl.appendChild(windEl);
+    listItemEl.appendChild(humidityEl);
 
-//     var statusEl = document.createElement('span');
-//     statusEl.classList = 'flex-row align-center';
+    statusEl.setAttribute('src', 'https://openweathermap.org/img/wn/' + weatherList.weather[0].icon + '@2x.png');
 
-//     if (repos[i].open_issues_count > 0) {
-//       statusEl.innerHTML =
-//         "<i class='fas fa-times status-icon icon-danger'></i>" + repos[i].open_issues_count + ' issue(s)';
-//     } else {
-//       statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
-//     }
+    dateEl.classList = 'flex-row align-left';
+    tempEl.classList = 'flex-row align-left';
+    statusEl.classList = 'flex-row align-left';
+    windEl.classList = 'flex-row align-left';
+    humidityEl.classList = 'flex-row align-left';
 
-//     repoEl.appendChild(statusEl);
-
-//     repoContainerEl.appendChild(repoEl);
-//   }
-// };
+    dateEl.textContent = 'Date: ' + weatherList.dt_txt;
+    tempEl.textContent = 'Tempature: ' + weatherList.main.temp;
+    windEl.textContent = 'Wind speed: ' + weatherList.wind.speed;
+    humidityEl.textContent = 'Humidity: ' + weatherList.main.humidity;
+  }
+};
 
 userFormEl.addEventListener('submit', formSubmitHandler);
-// submitButton.addEventListener('click', buttonClickHandler);
